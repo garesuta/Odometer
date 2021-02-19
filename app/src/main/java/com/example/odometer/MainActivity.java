@@ -11,10 +11,15 @@ import android.content.Intent;
 import android.os.Handler;
 import android.widget.TextView;
 import java.util.Locale;
+import android.content.pm.PackageManager;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 public class MainActivity extends AppCompatActivity {
     private OdometerService odometer;
     private boolean bound = false;
+    private final int PERMISSION_REQUEST_CODE = 698;
 
     private ServiceConnection connection = new ServiceConnection() {
         @Override
@@ -38,8 +43,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart(){
         super.onStart();
+        if(ContextCompat.checkSelfPermission(this,OdometerService.PERMISSION_STRING)!= PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this, new String[]{OdometerService.PERMISSION_STRING},PERMISSION_REQUEST_CODE);
+        }else{
         Intent intent = new Intent(this,OdometerService.class);
         bindService(intent, connection, Context.BIND_AUTO_CREATE);
+        }
     }
     @Override
     protected void onStop(){
